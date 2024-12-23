@@ -1,9 +1,13 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using SpotifyCli.Infrastructure;
+using SpotifyCli.TestingStuff;
+
+namespace SpotifyCli;
 
 class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
-        Console.WriteLine("Hello, World!");
+        var config = new AppConfig();
+        await Examples.PlaylistPlayExample(config);
     }
 }
