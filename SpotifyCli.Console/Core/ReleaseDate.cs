@@ -32,21 +32,31 @@ public class ReleaseDate
     }
 
     public bool IsAfterDateInclusive(int year, int? month = null, int? day = null) =>
-        (y: year, m: month, d: day) switch
+        (month, day) switch
         {
-            (var y, null, null) => Year >= y,
-            (var y, var m, null) => y > Year || (y == Year && m >= Month),
-            (var y, var m, var d) => y > Year
-                || (y == Year && (m > Month || (m == Month && d >= Day))),
+            (int m, int d) => Year > year
+                || (
+                    Year == year
+                    && (Month is null || Month > m || (Month == m && (Day is null || Day >= d)))
+                ),
+
+            (int m, null) => Year > year || (Year == year && (Month is null || Month >= m)),
+
+            (null, _) => Year >= year,
         };
 
     public bool IsBeforeDateInclusive(int year, int? month = null, int? day = null) =>
-        (y: year, m: month, d: day) switch
+        (month, day) switch
         {
-            (var y, null, null) => Year <= y,
-            (var y, var m, null) => y < Year || (y == Year && m <= Month),
-            (var y, var m, var d) => y < Year
-                || (y == Year && (m < Month || (m == Month && d <= Day))),
+            (int m, int d) => Year < year
+                || (
+                    Year == year
+                    && (Month is null || Month < m || (Month == m && (Day is null || Day <= d)))
+                ),
+
+            (int m, null) => Year < year || (Year == year && (Month is null || Month <= m)),
+
+            (null, _) => Year <= year,
         };
 
     public bool IsAtDate(int year, int? month = null, int? day = null)
