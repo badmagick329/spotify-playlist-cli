@@ -11,6 +11,7 @@ class SpotifyAuthenticator(string clientId, string credentialsPath, string callb
     private readonly string _clientId = clientId;
     private readonly string _callbackUrl = callbackUrl;
     private readonly int _port = port;
+    private bool _isReady = false;
 
     private EmbedIOAuthServer _server;
     public SpotifyClient Client { get; private set; }
@@ -33,9 +34,10 @@ class SpotifyAuthenticator(string clientId, string credentialsPath, string callb
         {
             await StartAuthentication();
         }
-        Console.WriteLine($"Press enter when done");
-        _ = Console.ReadKey();
-        Console.WriteLine($"Done. Client is ready.\n{Client}");
+        while (!_isReady)
+        {
+            await Task.Delay(500);
+        }
     }
 
     private static void Exiting() => Console.CursorVisible = true;
@@ -54,6 +56,7 @@ class SpotifyAuthenticator(string clientId, string credentialsPath, string callb
 
         Client = new SpotifyClient(config);
         _server?.Dispose();
+        _isReady = true;
     }
 
     private async Task StartAuthentication()
@@ -79,18 +82,11 @@ class SpotifyAuthenticator(string clientId, string credentialsPath, string callb
             CodeChallengeMethod = "S256",
             Scope =
             [
-                AppRemoteControl,
                 PlaylistModifyPrivate,
                 PlaylistReadCollaborative,
                 PlaylistReadPrivate,
                 UserLibraryModify,
                 UserLibraryRead,
-                UserModifyPlaybackState,
-                UserReadCurrentlyPlaying,
-                UserReadEmail,
-                UserReadPlaybackPosition,
-                UserReadPlaybackPosition,
-                UserReadPlaybackState,
                 UserReadPrivate,
                 UserTopRead,
                 PlaylistModifyPublic,
