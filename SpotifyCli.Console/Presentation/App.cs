@@ -32,40 +32,31 @@ class App
             return;
         }
 
-        AnsiConsole.MarkupLine("[yellow]Fetching tracks from playlists...[/]");
-        await createFilteredPlaylist.SetSourcePlaylists(selectedPlaylists);
-
         switch (CreateFilteredPlaylistInputHandler.AskFilterType())
         {
             case FilterType.DateRange:
+                (var startDate, var endDate) = CreateFilteredPlaylistInputHandler.AskReleaseDate();
+
+                AnsiConsole.MarkupLine("[yellow]Fetching tracks from playlists...[/]");
+                await createFilteredPlaylist.SetSourcePlaylists(selectedPlaylists);
+
                 AnsiConsole.MarkupLine("[yellow]Filtering by date range...[/]");
-                await FilterByDateRange(createFilteredPlaylist);
+                await createFilteredPlaylist.SpotifyPlaylistFromDateRange(startDate, endDate);
+
                 break;
             case FilterType.Artists:
+                var artistsInPlaylists = createFilteredPlaylist
+                    .ArtistsInSourcePlaylists()
+                    .OrderBy(a => a)
+                    .ToList();
+                var artists = CreateFilteredPlaylistInputHandler.AskArtists(artistsInPlaylists);
+
+                AnsiConsole.MarkupLine("[yellow]Fetching tracks from playlists...[/]");
+                await createFilteredPlaylist.SetSourcePlaylists(selectedPlaylists);
+
                 AnsiConsole.MarkupLine("[yellow]Filtering by artists...[/]");
-                await FilterByArtists(createFilteredPlaylist);
+                await createFilteredPlaylist.SpotifyPlaylistFromArtists(artists);
                 break;
         }
-    }
-
-    public static async Task FilterByDateRange(CreateFilteredPlaylist createFilteredPlaylist)
-    {
-        (var startDate, var endDate) = CreateFilteredPlaylistInputHandler.AskReleaseDate();
-        AnsiConsole.MarkupLine(
-            $"[yellow]Creating playlist with tracks from {startDate} to {endDate}...[/]"
-        );
-        await createFilteredPlaylist.SpotifyPlaylistFromDateRange(startDate, endDate);
-    }
-
-    public static async Task FilterByArtists(CreateFilteredPlaylist createFilteredPlaylist)
-    {
-        var artistsInPlaylists = createFilteredPlaylist
-            .ArtistsInSourcePlaylists()
-            .OrderBy(a => a)
-            .ToList();
-
-        var artists = CreateFilteredPlaylistInputHandler.AskArtists(artistsInPlaylists);
-        AnsiConsole.MarkupLine("[yellow]Creating playlist with tracks by selected artists...[/]");
-        await createFilteredPlaylist.SpotifyPlaylistFromArtists(artists);
     }
 }

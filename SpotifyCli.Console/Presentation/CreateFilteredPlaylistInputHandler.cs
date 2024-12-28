@@ -5,6 +5,8 @@ namespace SpotifyCli.Presentation;
 
 static class CreateFilteredPlaylistInputHandler
 {
+    const int PageSize = 15;
+
     public static string AskPlaylistName()
     {
         string newName = "";
@@ -23,7 +25,7 @@ static class CreateFilteredPlaylistInputHandler
             new MultiSelectionPrompt<string>()
                 .Title("[green]Select playlists to process[/]")
                 .Required()
-                .PageSize(10)
+                .PageSize(PageSize)
                 .MoreChoicesText("[grey]Move up and down to reveal more playlists[/]")
                 .InstructionsText(
                     "[grey](Press [blue]<space>[/] to select, [green]<enter>[/] to accept, [red]<esc>[/] to cancel)[/]"
@@ -102,16 +104,11 @@ static class CreateFilteredPlaylistInputHandler
         var filterType = AnsiConsole.Prompt(
             new SelectionPrompt<FilterType>()
                 .Title("[green]Select filter type[/]")
-                .PageSize(10)
+                .PageSize(PageSize)
                 .UseConverter(filter => filterChoices[filter])
                 .MoreChoicesText("[grey]Move up and down to reveal more filter types[/]")
                 .AddChoices(Enum.GetValues<FilterType>())
         );
-
-        if (filterType == default)
-        {
-            throw new OperationCanceledException("Filter type selection cancelled");
-        }
 
         return filterType;
     }
@@ -122,7 +119,7 @@ static class CreateFilteredPlaylistInputHandler
             new MultiSelectionPrompt<string>()
                 .Title("[green]Select artists to filter by[/]")
                 .Required()
-                .PageSize(10)
+                .PageSize(PageSize)
                 .MoreChoicesText("[grey]Move up and down to reveal more artists[/]")
                 .InstructionsText(
                     "[grey](Press [blue]<space>[/] to select, [green]<enter>[/] to accept, [red]<esc>[/] to cancel)[/]"

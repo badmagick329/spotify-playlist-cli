@@ -114,8 +114,5 @@ public class ReleaseDate
             ),
         };
 
-    public override string ToString()
-    {
-        return $"{ReleaseDateAsString} - {Year}-{Month ?? 0}-{Day ?? 0}";
-    }
+    public override string ToString() => ReleaseDateAsString;
 }
