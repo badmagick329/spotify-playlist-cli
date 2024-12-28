@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using SpotifyAPI.Web;
 using SpotifyCli.Infrastructure;
+using Swan;
 
 namespace SpotifyCli.TestingStuff;
 
@@ -149,6 +150,11 @@ class Examples
         var playlist = SamplePlaylist(allPlaylists);
         Debug.Assert(playlist.Id is not null);
         var newPlaylist = await CreateOrFetchPlaylist(client, allPlaylists, year.ToString());
+        var savedTracksUris = (await FetchPlaylistTracks(client, playlist.Id))
+            .Select(t => t.Track)
+            .OfType<FullTrack>()
+            .Select(t => t.Uri)
+            .ToList();
         Debug.Assert(newPlaylist.Id is not null);
 
         try
@@ -169,25 +175,37 @@ class Examples
                 {
                     if (tracksToAdd.Count > 99)
                     {
+                        Console.WriteLine("Adding 100 tracks to playlist");
                         await client.Playlists.AddItems(
                             newPlaylist.Id,
                             new PlaylistAddItemsRequest(tracksToAdd)
                         );
-                        Console.WriteLine("Added 100 tracks to playlist");
                         tracksToAdd.Clear();
-                        Console.WriteLine("Reset tracksToAdd");
-                        await Task.Delay(5000);
-                        tracksToAdd.Add(track.Uri);
+                        if (!savedTracksUris.Contains(track.Uri))
+                        {
+                            tracksToAdd.Add(track.Uri);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Track {track.Name} already exists in the playlist");
+                        }
                     }
                     else
                     {
-                        tracksToAdd.Add(track.Uri);
+                        if (!savedTracksUris.Contains(track.Uri))
+                        {
+                            tracksToAdd.Add(track.Uri);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Track {track.Name} already exists in the playlist");
+                        }
                     }
                 }
             }
-            Console.WriteLine("Finished loop with tracksToAdd count: " + tracksToAdd.Count);
             if (tracksToAdd.Count > 0)
             {
+                Console.WriteLine($"Adding the remaining {tracksToAdd.Count} tracks");
                 await client.Playlists.AddItems(
                     newPlaylist.Id,
                     new PlaylistAddItemsRequest(tracksToAdd)
@@ -216,5 +234,35 @@ class Examples
         var playlistCreateRequest = new PlaylistCreateRequest(newPlaylist);
         var me = await client.UserProfile.Current();
         return await client.Playlists.Create(me.Id, playlistCreateRequest);
+    }
+
+    public static async Task PlaylistInfoExample(AppConfig config)
+    {
+        var auth = new SpotifyAuthenticator(
+            config.ClientId,
+            config.CredentialsPath,
+            config.CallbackUrl,
+            config.Port
+        );
+        SampleDeviceId = config.SampleDeviceId;
+        PlaylistName = config.PlaylistName;
+
+        await auth.CreateClient();
+        var client = auth.Client;
+
+        var allPlaylists = await FetchAllPlaylists(client);
+        var playlist = SamplePlaylist(allPlaylists);
+        Debug.Assert(playlist.Id is not null);
+        var tracks = (await FetchPlaylistTracks(client, playlist.Id))
+            .Select(t => t.Track)
+            .OfType<FullTrack>()
+            .ToList();
+        foreach (var track in tracks)
+        {
+            Console.WriteLine($"Track info for {track.Humanize()}");
+            Console.WriteLine(
+                $"Name: {track.Name} - Popularity: {track.Popularity} - Category: {track.ReadProperty("Type")}"
+            );
+        }
     }
 }
