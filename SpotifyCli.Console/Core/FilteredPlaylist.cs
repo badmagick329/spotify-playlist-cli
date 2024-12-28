@@ -12,13 +12,6 @@ class FilteredPlaylist
         Name = name;
     }
 
-    public void FilterByReleaseDate(ReleaseDate releaseDate) =>
-        Tracks = SourcePlaylists
-            .SelectMany(sp =>
-                sp.FilterTracksByDate(releaseDate.Year, releaseDate.Month, releaseDate.Day)
-            )
-            .ToList();
-
     public void FilterByReleaseDateRange(ReleaseDate startDate, ReleaseDate endDate) =>
         Tracks = SourcePlaylists
             .SelectMany(sp => sp.FilterTracksByDateRange(startDate, endDate))

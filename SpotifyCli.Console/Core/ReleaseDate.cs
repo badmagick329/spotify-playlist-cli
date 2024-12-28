@@ -59,15 +59,8 @@ public class ReleaseDate
             (null, _) => Year <= year,
         };
 
-    public bool IsAtDate(int year, int? month = null, int? day = null)
-    {
-        return (y: year, m: month, d: day) switch
-        {
-            (var y, null, null) => Year == y,
-            (var y, var m, null) => y == Year && m == Month,
-            (var y, var m, var d) => y == Year && m == Month && d == Day,
-        };
-    }
+    public bool IsAtDate(int year, int? month = null, int? day = null) =>
+        Year == year && (Month is null || Month == month) && (Day is null || Day == day);
 
     public bool IsValid()
     {
