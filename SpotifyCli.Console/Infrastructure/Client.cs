@@ -80,6 +80,7 @@ class Client : IClient
             .OfType<FullTrack>()
             .Where(t => t.Album.ReleaseDate is not null)
             .Select(FullTrackMapper.FromFullTrack)
+            .Distinct()
             .ToList();
     }
 

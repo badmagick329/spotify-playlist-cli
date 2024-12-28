@@ -7,6 +7,22 @@ public class ReleaseDate
     public int? Month { get; init; }
     public int? Day { get; init; }
 
+    public ReleaseDate(int year, int? month = null, int? day = null)
+    {
+        Year = year;
+        Month = month;
+        Day = day;
+        ReleaseDateAsString = $"{Year}";
+        if (Month is not null)
+        {
+            ReleaseDateAsString += $"-{Month:D2}";
+            if (Day is not null)
+            {
+                ReleaseDateAsString += $"-{Day:D2}";
+            }
+        }
+    }
+
     public ReleaseDate(string releaseDate)
     {
         ReleaseDateAsString = releaseDate;
@@ -15,24 +31,22 @@ public class ReleaseDate
         Day = ReadDay(releaseDate);
     }
 
-    // TODO: Fix comparison
     public bool IsAfterDateInclusive(int year, int? month = null, int? day = null) =>
-        (y: Year, m: Month, d: Day) switch
+        (y: year, m: month, d: day) switch
         {
             (var y, null, null) => Year >= y,
-            (var y, var m, null) => y > year || (y == year && m >= month),
-            (var y, var m, var d) => y > year
-                || (y == year && (m > month || (m == month && d >= day))),
+            (var y, var m, null) => y > Year || (y == Year && m >= Month),
+            (var y, var m, var d) => y > Year
+                || (y == Year && (m > Month || (m == Month && d >= Day))),
         };
 
-    // TODO: Fix comparison
     public bool IsBeforeDateInclusive(int year, int? month = null, int? day = null) =>
-        (y: Year, m: Month, d: Day) switch
+        (y: year, m: month, d: day) switch
         {
             (var y, null, null) => Year <= y,
-            (var y, var m, null) => y < year || (y == year && m <= month),
-            (var y, var m, var d) => y < year
-                || (y == year && (m < month || (m == month && d <= day))),
+            (var y, var m, null) => y < Year || (y == Year && m <= Month),
+            (var y, var m, var d) => y < Year
+                || (y == Year && (m < Month || (m == Month && d <= Day))),
         };
 
     public bool IsAtDate(int year, int? month = null, int? day = null)
@@ -43,6 +57,21 @@ public class ReleaseDate
             (var y, var m, null) => y == Year && m == Month,
             (var y, var m, var d) => y == Year && m == Month && d == Day,
         };
+    }
+
+    public bool IsValid()
+    {
+        var month = Month ?? 1;
+        var day = Day ?? 1;
+        try
+        {
+            _ = new DateTime(Year, month, day);
+            return true;
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return false;
+        }
     }
 
     private static int ReadYear(string releaseDate) =>

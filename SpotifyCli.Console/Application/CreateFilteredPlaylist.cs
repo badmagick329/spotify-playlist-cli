@@ -1,3 +1,4 @@
+using Spectre.Console;
 using SpotifyCli.Core;
 
 namespace SpotifyCli.Application;
@@ -55,10 +56,22 @@ class CreateFilteredPlaylist
         }
     }
 
-    public async Task FilterByReleaseDate(ReleaseDate releaseDate)
+    public async Task SpotifyPlaylistFromDateRange(ReleaseDate startDate, ReleaseDate endDate)
     {
         var filteredPlaylist = new FilteredPlaylist(SourcePlaylists, _newName);
-        filteredPlaylist.FilterByReleaseDate(releaseDate);
+        filteredPlaylist.FilterByReleaseDateRange(startDate, endDate);
+        await _client.CreateFilteredPlaylist(filteredPlaylist);
+    }
+
+    public IEnumerable<string> ArtistsInSourcePlaylists()
+    {
+        return SourcePlaylists.SelectMany(p => p.ArtistsInPlaylist()).Distinct();
+    }
+
+    public async Task SpotifyPlaylistFromArtists(List<string> artists)
+    {
+        var filteredPlaylist = new FilteredPlaylist(SourcePlaylists, _newName);
+        filteredPlaylist.FilterByArtists(artists);
         await _client.CreateFilteredPlaylist(filteredPlaylist);
     }
 }

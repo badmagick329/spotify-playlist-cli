@@ -18,4 +18,14 @@ class FilteredPlaylist
                 sp.FilterTracksByDate(releaseDate.Year, releaseDate.Month, releaseDate.Day)
             )
             .ToList();
+
+    public void FilterByReleaseDateRange(ReleaseDate startDate, ReleaseDate endDate) =>
+        Tracks = SourcePlaylists
+            .SelectMany(sp => sp.FilterTracksByDateRange(startDate, endDate))
+            .ToList();
+
+    public void FilterByArtists(List<string> artists)
+    {
+        Tracks = SourcePlaylists.SelectMany(sp => sp.FilterTracksByArtists(artists)).ToList();
+    }
 }
