@@ -16,22 +16,6 @@ public class Playlist
         TrackCount = trackCount;
     }
 
-    public List<Track> FilterTracksByDate(int year, int? month = null, int? day = null)
-    {
-        ArgumentNullException.ThrowIfNull(SavedTracks);
-        if (day is not null)
-        {
-            Debug.Assert(month is not null, "day can only be specified if month is specified");
-            Debug.Assert(day >= 1 && day <= 31, "day must be between 1 and 31");
-        }
-        if (month is not null)
-        {
-            Debug.Assert(month >= 1 && month <= 12, "month must be between 1 and 12");
-        }
-
-        return SavedTracks.Where(t => t.IsAtDate(year, month, day)).ToList();
-    }
-
     public List<Track> FilterTracksByDateRange(ReleaseDate startDate, ReleaseDate endDate)
     {
         ArgumentNullException.ThrowIfNull(SavedTracks);

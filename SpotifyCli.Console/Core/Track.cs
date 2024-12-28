@@ -25,28 +25,6 @@ public class Track
         }
     }
 
-    public bool IsAfterDateInclusive(int year, int? month = null, int? day = null) =>
-        ReleaseDate.IsAfterDateInclusive(year, month, day);
-
-    public bool IsBeforeDateInclusive(int year, int? month = null, int? day = null) =>
-        ReleaseDate.IsBeforeDateInclusive(year, month, day);
-
-    public bool IsAtDate(int year, int? month = null, int? day = null)
-    {
-        if (day is not null)
-        {
-            Debug.Assert(month is not null, "day can only be specified if month is specified");
-            Debug.Assert(day >= 1 && day <= 31, "day must be between 1 and 31");
-        }
-        if (month is not null)
-        {
-            Debug.Assert(month >= 1 && month <= 12, "month must be between 1 and 12");
-        }
-        var result = ReleaseDate.IsAtDate(year, month, day);
-
-        return ReleaseDate.IsAtDate(year, month, day);
-    }
-
     public override bool Equals(object? obj)
     {
         if (obj is not Track track)
