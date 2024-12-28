@@ -31,4 +31,30 @@ public class Playlist
 
         return SavedTracks.Where(t => t.IsAtDate(year, month, day)).ToList();
     }
+
+    public List<Track> FilterTracksByDateRange(ReleaseDate startDate, ReleaseDate endDate)
+    {
+        ArgumentNullException.ThrowIfNull(SavedTracks);
+
+        return SavedTracks
+            .Where(t =>
+                t.ReleaseDate.IsAfterDateInclusive(startDate.Year, startDate.Month, startDate.Day)
+                && t.ReleaseDate.IsBeforeDateInclusive(endDate.Year, endDate.Month, endDate.Day)
+            )
+            .ToList();
+    }
+
+    public IEnumerable<string> ArtistsInPlaylist()
+    {
+        ArgumentNullException.ThrowIfNull(SavedTracks);
+
+        return SavedTracks.SelectMany(t => t.Artists).Distinct();
+    }
+
+    public List<Track> FilterTracksByArtists(List<string> artists)
+    {
+        ArgumentNullException.ThrowIfNull(SavedTracks);
+
+        return SavedTracks.Where(t => t.Artists.Intersect(artists).Any()).ToList();
+    }
 }
