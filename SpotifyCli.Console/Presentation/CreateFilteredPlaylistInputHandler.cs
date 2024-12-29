@@ -101,7 +101,7 @@ static class CreateFilteredPlaylistInputHandler
             { FilterType.Artists, "Filter by specific artists" },
         };
 
-        var filterType = AnsiConsole.Prompt(
+        return AnsiConsole.Prompt(
             new SelectionPrompt<FilterType>()
                 .Title("[green]Select filter type[/]")
                 .PageSize(PageSize)
@@ -109,8 +109,27 @@ static class CreateFilteredPlaylistInputHandler
                 .MoreChoicesText("[grey]Move up and down to reveal more filter types[/]")
                 .AddChoices(Enum.GetValues<FilterType>())
         );
+    }
 
-        return filterType;
+    public static List<FilterType> AskFilterTypes()
+    {
+        var filterChoices = new Dictionary<FilterType, string>
+        {
+            { FilterType.DateRange, "Filter by date range" },
+            { FilterType.Artists, "Filter by specific artists" },
+        };
+
+        return AnsiConsole.Prompt(
+            new MultiSelectionPrompt<FilterType>()
+                .Title("[green]Select filter types[/]")
+                .PageSize(PageSize)
+                .MoreChoicesText("[grey]Move up and down to reveal more filter types[/]")
+                .InstructionsText(
+                    "[grey](Press [blue]<space>[/] to select, [green]<enter>[/] to accept, [red]<esc>[/] to cancel)[/]"
+                )
+                .UseConverter(filter => filterChoices[filter])
+                .AddChoices(Enum.GetValues<FilterType>())
+        );
     }
 
     public static List<string> AskArtists(List<string> artists)

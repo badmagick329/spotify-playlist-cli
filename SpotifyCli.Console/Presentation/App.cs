@@ -32,31 +32,38 @@ class App
             return;
         }
 
-        switch (CreateFilteredPlaylistInputHandler.AskFilterType())
+        AnsiConsole.MarkupLine("[yellow]Fetching tracks from playlists...[/]");
+        await createFilteredPlaylist.SetSourcePlaylists(selectedPlaylists);
+
+        foreach (var filterType in CreateFilteredPlaylistInputHandler.AskFilterTypes())
         {
-            case FilterType.DateRange:
-                (var startDate, var endDate) = CreateFilteredPlaylistInputHandler.AskReleaseDate();
+            switch (filterType)
+            {
+                case FilterType.DateRange:
+                    (var startDate, var endDate) =
+                        CreateFilteredPlaylistInputHandler.AskReleaseDate();
 
-                AnsiConsole.MarkupLine("[yellow]Fetching tracks from playlists...[/]");
-                await createFilteredPlaylist.SetSourcePlaylists(selectedPlaylists);
+                    createFilteredPlaylist.AddFilterFromDateRange(startDate, endDate);
 
-                AnsiConsole.MarkupLine("[yellow]Filtering by date range...[/]");
-                await createFilteredPlaylist.SpotifyPlaylistFromDateRange(startDate, endDate);
+                    break;
+                case FilterType.Artists:
+                    var artistsInPlaylists = createFilteredPlaylist
+                        .ArtistsInSourcePlaylists()
+                        .OrderBy(a => a)
+                        .ToList();
+                    var artists = CreateFilteredPlaylistInputHandler.AskArtists(artistsInPlaylists);
 
-                break;
-            case FilterType.Artists:
-                var artistsInPlaylists = createFilteredPlaylist
-                    .ArtistsInSourcePlaylists()
-                    .OrderBy(a => a)
-                    .ToList();
-                var artists = CreateFilteredPlaylistInputHandler.AskArtists(artistsInPlaylists);
-
-                AnsiConsole.MarkupLine("[yellow]Fetching tracks from playlists...[/]");
-                await createFilteredPlaylist.SetSourcePlaylists(selectedPlaylists);
-
-                AnsiConsole.MarkupLine("[yellow]Filtering by artists...[/]");
-                await createFilteredPlaylist.SpotifyPlaylistFromArtists(artists);
-                break;
+                    createFilteredPlaylist.AddFilterFromArtists(artists);
+                    break;
+            }
         }
+        if (createFilteredPlaylist.FilteredPlaylist.Tracks.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[yellow]No tracks match the criteria. Operation cancelled.[/]");
+            return;
+        }
+
+        AnsiConsole.MarkupLine("[yellow]Creating filtered playlist...[/]");
+        await createFilteredPlaylist.CreateSpotifyPlaylist();
     }
 }

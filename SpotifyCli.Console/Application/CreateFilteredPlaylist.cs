@@ -33,7 +33,20 @@ class CreateFilteredPlaylist
         }
         private set { _sourcePlaylists = value; }
     }
-    public List<string> AllPlaylistIds => AllPlaylists.Select(p => p.Id).ToList();
+
+    private FilteredPlaylist? _filteredPlaylist = null;
+    public FilteredPlaylist FilteredPlaylist
+    {
+        get
+        {
+            ArgumentNullException.ThrowIfNull(
+                _filteredPlaylist,
+                "FilteredPlaylists must be set before accessing"
+            );
+            return _filteredPlaylist;
+        }
+        private set { _filteredPlaylist = value; }
+    }
 
     public CreateFilteredPlaylist(IClient client, string newName)
     {
@@ -54,24 +67,20 @@ class CreateFilteredPlaylist
         {
             playlist.SavedTracks = await _client.FetchPlaylistTracks(playlist.Id);
         }
+        FilteredPlaylist = new FilteredPlaylist(SourcePlaylists, _newName);
     }
 
-    public async Task SpotifyPlaylistFromDateRange(ReleaseDate startDate, ReleaseDate endDate)
-    {
-        var filteredPlaylist = new FilteredPlaylist(SourcePlaylists, _newName);
-        filteredPlaylist.FilterByReleaseDateRange(startDate, endDate);
-        await _client.CreateFilteredPlaylist(filteredPlaylist);
-    }
+    public void AddFilterFromDateRange(ReleaseDate startDate, ReleaseDate endDate) =>
+        FilteredPlaylist.FilterByReleaseDateRange(startDate, endDate);
+
+    public void AddFilterFromArtists(List<string> artists) =>
+        FilteredPlaylist.FilterByArtists(artists);
+
+    public async Task CreateSpotifyPlaylist() =>
+        await _client.CreateFilteredPlaylist(FilteredPlaylist);
 
     public IEnumerable<string> ArtistsInSourcePlaylists()
     {
         return SourcePlaylists.SelectMany(p => p.ArtistsInPlaylist()).Distinct();
-    }
-
-    public async Task SpotifyPlaylistFromArtists(List<string> artists)
-    {
-        var filteredPlaylist = new FilteredPlaylist(SourcePlaylists, _newName);
-        filteredPlaylist.FilterByArtists(artists);
-        await _client.CreateFilteredPlaylist(filteredPlaylist);
     }
 }
