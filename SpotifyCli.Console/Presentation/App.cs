@@ -33,7 +33,7 @@ class App
         }
 
         AnsiConsole.MarkupLine("[yellow]Fetching tracks from playlists...[/]");
-        await createFilteredPlaylist.SetSourcePlaylists(selectedPlaylists);
+        await createFilteredPlaylist.SetSourcesAndInitializeFilteredPlaylist(selectedPlaylists);
 
         foreach (var filterType in CreateFilteredPlaylistInputHandler.AskFilterTypes())
         {

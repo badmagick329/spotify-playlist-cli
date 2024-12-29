@@ -59,15 +59,14 @@ class CreateFilteredPlaylist
         AllPlaylists = await _client.FetchAllPlaylists();
     }
 
-    public async Task SetSourcePlaylists(List<string> sourceIds)
+    // TODO: Refactor
+    public async Task SetSourcesAndInitializeFilteredPlaylist(List<string> sourceIds)
     {
         SourcePlaylists = AllPlaylists.Where(p => sourceIds.Contains(p.Id)).ToList();
-
-        foreach (var playlist in SourcePlaylists)
-        {
-            playlist.SavedTracks = await _client.FetchPlaylistTracks(playlist.Id);
-        }
-        FilteredPlaylist = new FilteredPlaylist(SourcePlaylists, _newName);
+        FilteredPlaylist = await _client.FetchSourceTracksAndCreateFilteredPLaylist(
+            SourcePlaylists,
+            _newName
+        );
     }
 
     public void AddFilterFromDateRange(ReleaseDate startDate, ReleaseDate endDate) =>
@@ -77,10 +76,8 @@ class CreateFilteredPlaylist
         FilteredPlaylist.FilterByArtists(artists);
 
     public async Task CreateSpotifyPlaylist() =>
-        await _client.CreateFilteredPlaylist(FilteredPlaylist);
+        await _client.CreateSpotifyPlaylist(FilteredPlaylist);
 
-    public IEnumerable<string> ArtistsInSourcePlaylists()
-    {
-        return SourcePlaylists.SelectMany(p => p.ArtistsInPlaylist()).Distinct();
-    }
+    public IEnumerable<string> ArtistsInSourcePlaylists() =>
+        SourcePlaylists.SelectMany(p => p.ArtistsInPlaylist()).Distinct();
 }
