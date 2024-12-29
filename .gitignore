@@ -484,7 +484,6 @@ $RECYCLE.BIN/
 *.swp
 
 # Keys and settings
-spotifycli-settings.json
 credentials.json
 .config/*
 .ignore/*
