@@ -42,7 +42,7 @@ class Client : IClient
             await SpotifyClient.Playlists.CurrentUsers().ConfigureAwait(false)
         );
 
-    public async Task CreateFilteredPlaylist(FilteredPlaylist filteredPlaylist)
+    public async Task CreateSpotifyPlaylist(FilteredPlaylist filteredPlaylist)
     {
         var createdPlaylist = await CreateOrFetchPlaylist(
             filteredPlaylist.SourcePlaylists,
@@ -70,7 +70,20 @@ class Client : IClient
         return createdPlaylist;
     }
 
-    public async Task<List<Track>> FetchPlaylistTracks(string playlistId)
+    // TODO: Refactor?
+    public async Task<FilteredPlaylist> FetchSourceTracksAndCreateFilteredPLaylist(
+        List<Playlist> sourcePlaylists,
+        string newName
+    )
+    {
+        foreach (var playlist in sourcePlaylists)
+        {
+            playlist.SavedTracks = await FetchPlaylistTracks(playlist.Id);
+        }
+        return new FilteredPlaylist(sourcePlaylists, newName);
+    }
+
+    private async Task<List<Track>> FetchPlaylistTracks(string playlistId)
     {
         var tracks =
             await SpotifyClient.PaginateAll(await SpotifyClient.Playlists.GetItems(playlistId))
