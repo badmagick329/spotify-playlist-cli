@@ -10,8 +10,6 @@ class AppConfig
     public string ClientId { get; }
     public string CallbackUrl { get; }
     public int Port { get; }
-    public string PlaylistName { get; }
-    public string SampleDeviceId { get; set; }
 
     public AppConfig()
     {
@@ -24,14 +22,11 @@ class AppConfig
         Debug.Assert(config["ClientId"] is not null);
         Debug.Assert(config["CallbackUrl"] is not null);
         Debug.Assert(config["Port"] is not null);
-        Debug.Assert(config["PlaylistName"] is not null);
 
         CredentialsPath = config["CredentialsPath"]!;
         ClientId = config["ClientId"]!;
         CallbackUrl = config["CallbackUrl"]!;
         Port = int.Parse(config["Port"]!);
-        PlaylistName = config["PlaylistName"]!;
-        SampleDeviceId = config["SampleDeviceId"] ?? "";
     }
 
     public void Save() =>
@@ -41,5 +36,5 @@ class AppConfig
         );
 
     public override string ToString() =>
-        $"CredentialsPath: {CredentialsPath}\nClientId: {ClientId}\nCallbackUrl: {CallbackUrl}\nPort: {Port}\nPlaylistName: {PlaylistName}";
+        $"CredentialsPath: {CredentialsPath}\nClientId: {ClientId}\nCallbackUrl: {CallbackUrl}\nPort: {Port}\n";
 }
