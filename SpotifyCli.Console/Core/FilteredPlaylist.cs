@@ -12,13 +12,33 @@ class FilteredPlaylist
         Name = name;
     }
 
-    public void FilterByReleaseDateRange(ReleaseDate startDate, ReleaseDate endDate) =>
-        Tracks = SourcePlaylists
+    public void FilterByReleaseDateRange(ReleaseDate startDate, ReleaseDate endDate)
+    {
+        if (Tracks.Count == 0)
+        {
+            Tracks = SourcePlaylists
+                .SelectMany(sp => sp.FilterTracksByDateRange(startDate, endDate))
+                .ToList();
+            return;
+        }
+
+        var newTracks = SourcePlaylists
             .SelectMany(sp => sp.FilterTracksByDateRange(startDate, endDate))
             .ToList();
+        Tracks = Tracks.Intersect(newTracks).ToList();
+    }
 
     public void FilterByArtists(List<string> artists)
     {
-        Tracks = SourcePlaylists.SelectMany(sp => sp.FilterTracksByArtists(artists)).ToList();
+        if (Tracks.Count == 0)
+        {
+            Tracks = SourcePlaylists.SelectMany(sp => sp.FilterTracksByArtists(artists)).ToList();
+            return;
+        }
+
+        var newTracks = SourcePlaylists
+            .SelectMany(sp => sp.FilterTracksByArtists(artists))
+            .ToList();
+        Tracks = Tracks.Intersect(newTracks).ToList();
     }
 }
