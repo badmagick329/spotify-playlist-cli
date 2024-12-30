@@ -1,4 +1,3 @@
-using Spectre.Console;
 using SpotifyCli.Core;
 
 namespace SpotifyCli.Application;
