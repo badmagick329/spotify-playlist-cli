@@ -44,7 +44,6 @@ class App
                         CreateFilteredPlaylistInputHandler.AskReleaseDate();
 
                     createFilteredPlaylist.AddFilterFromDateRange(startDate, endDate);
-
                     break;
                 case FilterType.Artists:
                     var artistsInPlaylists = createFilteredPlaylist

@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace SpotifyCli.Core;
 
 public class Playlist
