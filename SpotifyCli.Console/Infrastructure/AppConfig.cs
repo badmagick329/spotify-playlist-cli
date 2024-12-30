@@ -6,10 +6,10 @@ namespace SpotifyCli.Infrastructure;
 
 class AppConfig
 {
-    public const string ClientId = "7b8d444608624727b5f518179c2c4052";
+    public string ClientId { get; }
     public string CredentialsPath { get; }
     public int Port { get; }
-    public string CallbackUrl => $"http://localhost:{Port}/callback";
+    public string CallbackUrl { get; }
 
     public AppConfig()
     {
@@ -18,11 +18,16 @@ class AppConfig
             .AddJsonFile("spotifycli-settings.json", optional: false)
             .Build();
 
-        Debug.Assert(config["Port"] is not null);
+        Debug.Assert(config["ClientId"] is not null);
         Debug.Assert(config["CredentialsPath"] is not null);
+        Debug.Assert(config["Port"] is not null);
+        Debug.Assert(int.TryParse(config["Port"], out _));
+        Debug.Assert(config["CallbackUrl"] is not null);
 
+        ClientId = config["ClientId"]!;
         CredentialsPath = config["CredentialsPath"]!;
         Port = int.Parse(config["Port"]!);
+        CallbackUrl = config["CallbackUrl"]!;
     }
 
     public void Save() =>

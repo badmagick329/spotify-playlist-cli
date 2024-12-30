@@ -1,5 +1,6 @@
 {
+  "ClientId": "7b8d444608624727b5f518179c2c4052",
   "CredentialsPath": "credentials.json",
-  "Port": "8000",
-  "SourcePlaylistIds": []
+  "CallbackUrl": "http://localhost:8000/callback",
+  "Port": "8000"
 }

@@ -15,7 +15,7 @@ class Client : IClient
     public Client(AppConfig config)
     {
         _spotifyAuthenticator = new SpotifyAuthenticator(
-            AppConfig.ClientId,
+            config.ClientId,
             config.CredentialsPath,
             config.CallbackUrl,
             config.Port
