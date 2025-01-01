@@ -7,7 +7,7 @@ interface IClient
     public Task Initialize();
 
     public Task<List<Playlist>> FetchAllPlaylists();
-    public Task<FilteredPlaylist> FetchSourceTracksAndCreateFilteredPLaylist(
+    public Task<FilteredPlaylist> FetchSourceTracksAndCreateFilteredPlaylist(
         List<Playlist> sourcePlaylists,
         string newName
     );

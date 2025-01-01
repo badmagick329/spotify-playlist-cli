@@ -1,24 +1,15 @@
 namespace SpotifyCli.Core;
 
-public class Playlist
+public class Playlist : BasePlaylist
 {
-    public string Id { get; private set; }
-    public string Name { get; private set; }
-    public int TrackCount { get; private set; }
-    public List<Track>? SavedTracks { get; set; } = null;
-
     public Playlist(string id, string name, int trackCount)
-    {
-        Id = id;
-        Name = name;
-        TrackCount = trackCount;
-    }
+        : base(id, name, trackCount) { }
 
-    public List<Track> FilterTracksByDateRange(ReleaseDate startDate, ReleaseDate endDate)
+    public override List<Track> FilterTracksByDateRange(ReleaseDate startDate, ReleaseDate endDate)
     {
-        ArgumentNullException.ThrowIfNull(SavedTracks);
+        EnsureSavedTracksIsNotNull();
 
-        return SavedTracks
+        return SavedTracks!
             .Where(t =>
                 t.ReleaseDate.IsAfterDateInclusive(startDate.Year, startDate.Month, startDate.Day)
                 && t.ReleaseDate.IsBeforeDateInclusive(endDate.Year, endDate.Month, endDate.Day)
@@ -26,17 +17,34 @@ public class Playlist
             .ToList();
     }
 
-    public IEnumerable<string> ArtistsInPlaylist()
+    public override IEnumerable<string> ArtistsInPlaylist()
     {
-        ArgumentNullException.ThrowIfNull(SavedTracks);
-
-        return SavedTracks.SelectMany(t => t.Artists).Distinct();
+        EnsureSavedTracksIsNotNull();
+        return SavedTracks!.SelectMany(t => t.Artists).Distinct();
     }
 
-    public List<Track> FilterTracksByArtists(List<string> artists)
+    public override List<Track> FilterTracksByArtists(List<string> artists)
     {
-        ArgumentNullException.ThrowIfNull(SavedTracks);
+        EnsureSavedTracksIsNotNull();
 
-        return SavedTracks.Where(t => t.Artists.Intersect(artists).Any()).ToList();
+        return SavedTracks!.Where(t => t.Artists.Intersect(artists).Any()).ToList();
+    }
+
+    // TODO: FetchTracks and FetchTracksFunc are terrible names and easily mixed up
+    public override async Task FetchTracks()
+    {
+        ArgumentNullException.ThrowIfNull(
+            FetchTracksFunc,
+            "FetchTracksFunc is null. Ensure it has been set."
+        );
+        SavedTracks = await FetchTracksFunc();
+    }
+
+    private void EnsureSavedTracksIsNotNull()
+    {
+        ArgumentNullException.ThrowIfNull(
+            SavedTracks,
+            "SavedTracks is null. Ensure FetchTracks has been called."
+        );
     }
 }

@@ -31,10 +31,26 @@ class Client : IClient
     public async Task<List<Playlist>> FetchAllPlaylists()
     {
         var fullPlaylists = await FetchAllFullPlaylists();
-        return fullPlaylists
+        var playlists = fullPlaylists
             .Select(FullPlaylistMapper.FromFullPlaylist)
             .OfType<Playlist>()
+            .Select(p =>
+            {
+                p.FetchTracksFunc = async () => await FetchPlaylistTracks(p.Id);
+                return p;
+            })
             .ToList();
+
+        var tracks = await SpotifyClient.Library.GetTracks();
+        var libraryPlaylist = TracksToPlaylistMapper.FromTracks(
+            "UserLibrary",
+            "Saved Tracks",
+            tracks.Total ?? -1
+        );
+        libraryPlaylist.FetchTracksFunc = () => FetchLibraryTracks(tracks);
+        playlists.Add(libraryPlaylist);
+
+        return playlists;
     }
 
     private async Task<IList<FullPlaylist>> FetchAllFullPlaylists() =>
@@ -58,7 +74,7 @@ class Client : IClient
         {
             if (p.Name == newPlaylist)
             {
-                p.SavedTracks = await FetchPlaylistTracks(p.Id);
+                await p.FetchTracks();
                 return p;
             }
         }
@@ -71,14 +87,18 @@ class Client : IClient
     }
 
     // TODO: Refactor?
-    public async Task<FilteredPlaylist> FetchSourceTracksAndCreateFilteredPLaylist(
+    public async Task<FilteredPlaylist> FetchSourceTracksAndCreateFilteredPlaylist(
         List<Playlist> sourcePlaylists,
         string newName
     )
     {
         foreach (var playlist in sourcePlaylists)
         {
-            playlist.SavedTracks = await FetchPlaylistTracks(playlist.Id);
+            if (playlist.SavedTracks is not null)
+            {
+                continue;
+            }
+            await playlist.FetchTracks();
         }
         return new FilteredPlaylist(sourcePlaylists, newName);
     }
@@ -89,6 +109,20 @@ class Client : IClient
             await SpotifyClient.PaginateAll(await SpotifyClient.Playlists.GetItems(playlistId))
             ?? throw new InvalidOperationException("Playlist is empty");
         return tracks
+            .Select(t => t.Track)
+            .OfType<FullTrack>()
+            .Where(t => t.Album.ReleaseDate is not null)
+            .Select(FullTrackMapper.FromFullTrack)
+            .Distinct()
+            .ToList();
+    }
+
+    private async Task<List<Track>> FetchLibraryTracks(Paging<SavedTrack>? savedTrackPaging)
+    {
+        ArgumentNullException.ThrowIfNull(savedTrackPaging, "SavedTrackPaging is null");
+
+        var libraryTracks = await SpotifyClient.PaginateAll(savedTrackPaging);
+        return libraryTracks
             .Select(t => t.Track)
             .OfType<FullTrack>()
             .Where(t => t.Album.ReleaseDate is not null)
