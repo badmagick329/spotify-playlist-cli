@@ -3,6 +3,7 @@ namespace SpotifyCli.Core;
 class FilteredPlaylist
 {
     public List<Playlist> SourcePlaylists { get; private set; }
+
     public List<Track> Tracks { get; private set; } = [];
     public string Name { get; init; }
 

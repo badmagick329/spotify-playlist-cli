@@ -62,7 +62,7 @@ class CreateFilteredPlaylist
     public async Task SetSourcesAndInitializeFilteredPlaylist(List<string> sourceIds)
     {
         SourcePlaylists = AllPlaylists.Where(p => sourceIds.Contains(p.Id)).ToList();
-        FilteredPlaylist = await _client.FetchSourceTracksAndCreateFilteredPLaylist(
+        FilteredPlaylist = await _client.FetchSourceTracksAndCreateFilteredPlaylist(
             SourcePlaylists,
             _newName
         );
