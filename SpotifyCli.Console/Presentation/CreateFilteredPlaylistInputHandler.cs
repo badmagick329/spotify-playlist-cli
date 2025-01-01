@@ -28,7 +28,7 @@ static class CreateFilteredPlaylistInputHandler
                 .PageSize(PageSize)
                 .MoreChoicesText("[grey]Move up and down to reveal more playlists[/]")
                 .InstructionsText(
-                    "[grey](Press [blue]<space>[/] to select, [green]<enter>[/] to accept, [red]<esc>[/] to cancel)[/]"
+                    "[grey](Press [blue]<space>[/] to select, [green]<enter>[/] to accept, [red]<ctrl+c>[/] to cancel)[/]"
                 )
                 .AddChoices(selectionList)
         );
