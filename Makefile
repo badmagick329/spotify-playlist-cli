@@ -12,10 +12,12 @@ win:
 osx:
 	@echo "Building for macOS (osx-x64)..."
 	dotnet publish $(PROJECT_PATH) -c $(CONFIGURATION) -r osx-x64 --output $(OUTPUT_DIR)/osx --self-contained -p:PublishSingleFile=true
+	mv $(OUTPUT_DIR)/osx/$(PROJECT_NAME) $(OUTPUT_DIR)/osx/$(PROJECT_NAME)-macos
 
 linux:
 	@echo "Building for Linux (linux-x64)..."
 	dotnet publish $(PROJECT_PATH) -c $(CONFIGURATION) -r linux-x64 --output $(OUTPUT_DIR)/linux --self-contained -p:PublishSingleFile=true
+	mv $(OUTPUT_DIR)/linux/$(PROJECT_NAME) $(OUTPUT_DIR)/linux/$(PROJECT_NAME)-linux
 
 clean:
 	@echo "Cleaning up..."
