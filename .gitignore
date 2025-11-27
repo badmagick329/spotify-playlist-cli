@@ -488,3 +488,4 @@ credentials.json
 .config/*
 .ignore/*
 spotifycli-cache.json
+spotifycli-settings.json
