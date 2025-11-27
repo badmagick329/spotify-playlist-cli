@@ -1,0 +1,6 @@
+{
+  "ClientId": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "CredentialsPath": "credentials.json",
+  "CallbackUrl": "http://localhost:8000/callback",
+  "Port": "8000"
+}
