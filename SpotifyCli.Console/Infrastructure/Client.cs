@@ -103,7 +103,7 @@ class Client : IClient
         return new FilteredPlaylist(sourcePlaylists, newName);
     }
 
-    private async Task<List<Track>> FetchPlaylistTracks(string playlistId)
+    public async Task<List<Track>> FetchPlaylistTracks(string playlistId)
     {
         var tracks =
             await SpotifyClient.PaginateAll(await SpotifyClient.Playlists.GetItems(playlistId))
