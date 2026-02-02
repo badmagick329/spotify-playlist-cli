@@ -38,6 +38,6 @@ public class Track
     public override string ToString()
     {
         var artists = string.Join(", ", Artists);
-        return $"{Name} by {artists} ({ReleaseDate})";
+        return $"({ReleaseDate}) {Name} __ {artists} ";
     }
 }

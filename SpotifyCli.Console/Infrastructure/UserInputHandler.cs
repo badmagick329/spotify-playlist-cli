@@ -1,13 +1,13 @@
 using Spectre.Console;
 using SpotifyCli.Core;
 
-namespace SpotifyCli.Presentation;
+namespace SpotifyCli.Infrastructure;
 
-static class CreateFilteredPlaylistInputHandler
+public class UserInputHandler : IUserInputHandler
 {
     const int PageSize = 15;
 
-    public static string AskPlaylistName()
+    public string AskNewPlaylistName()
     {
         string newName = "";
         while (newName == "")
@@ -17,13 +17,13 @@ static class CreateFilteredPlaylistInputHandler
         return newName;
     }
 
-    public static List<string> AskSelectedPlayistIds(List<Playlist> playlists)
+    public List<string> AskSelectedPlayistIds(List<Playlist> playlists)
     {
         var numberToId = NumberToIdMapper(playlists);
         var selectionList = CreatePlaylistSelectionList(playlists);
         var selectedPlaylists = AnsiConsole.Prompt(
             new MultiSelectionPrompt<string>()
-                .Title("[green]Select playlists to process[/]")
+                .Title("[green]Select playlists[/]")
                 .Required()
                 .PageSize(PageSize)
                 .MoreChoicesText("[grey]Move up and down to reveal more playlists[/]")
@@ -58,7 +58,7 @@ static class CreateFilteredPlaylistInputHandler
         return selectionList;
     }
 
-    public static (ReleaseDate startDate, ReleaseDate endDate) AskReleaseDate()
+    public (ReleaseDate startDate, ReleaseDate endDate) AskReleaseDate()
     {
         ReleaseDate startDate;
         ReleaseDate endDate;
@@ -93,7 +93,7 @@ static class CreateFilteredPlaylistInputHandler
         return (startDate, endDate);
     }
 
-    public static FilterType AskFilterType()
+    public FilterType AskFilterType()
     {
         var filterChoices = new Dictionary<FilterType, string>
         {
@@ -111,7 +111,7 @@ static class CreateFilteredPlaylistInputHandler
         );
     }
 
-    public static List<FilterType> AskFilterTypes()
+    public List<FilterType> AskFilterTypes()
     {
         var filterChoices = new Dictionary<FilterType, string>
         {
@@ -132,7 +132,7 @@ static class CreateFilteredPlaylistInputHandler
         );
     }
 
-    public static List<string> AskArtists(List<string> artists)
+    public List<string> AskArtists(List<string> artists)
     {
         return AnsiConsole.Prompt(
             new MultiSelectionPrompt<string>()
@@ -144,6 +144,17 @@ static class CreateFilteredPlaylistInputHandler
                     "[grey](Press [blue]<space>[/] to select, [green]<enter>[/] to accept, [red]<esc>[/] to cancel)[/]"
                 )
                 .AddChoices(artists)
+        );
+    }
+
+    public AppMode AskAppMode()
+    {
+        return AnsiConsole.Prompt(
+            new SelectionPrompt<AppMode>()
+                .Title("[green]Select application mode[/]")
+                .PageSize(PageSize)
+                .MoreChoicesText("[grey]Move up and down to reveal more modes[/]")
+                .AddChoices(Enum.GetValues<AppMode>())
         );
     }
 }
