@@ -486,6 +486,6 @@ $RECYCLE.BIN/
 # Keys and settings
 credentials.json
 .config/*
-.ignore/*
+.ignore/
 spotifycli-cache.json
 spotifycli-settings.json
